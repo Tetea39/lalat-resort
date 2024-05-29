@@ -3,7 +3,6 @@
 session_start();
 
 require('config.php');
-require('razorpay-php/razorpay-php/Razorpay.php');
 
 use Razorpay\Api\Api;
 
