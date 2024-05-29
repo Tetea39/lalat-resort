@@ -1,41 +1,107 @@
 <?php
 session_start();
+require('config.php');
+require('vendor/autoload.php');
+
+use Razorpay\Api\Api;
+
+if (!empty($_SESSION['total_amount'])) {
+
+	$_SESSION['amount'] = $_SESSION['total_amount'];
+	// $_SESSION['amount'] = 1;
+	$_SESSION['name'] = $_SESSION['firstname'] . ' ' . $_SESSION['lastname'];
+	$_SESSION['email'] = $_SESSION['email'];
+	// $_SESSION['booking_id'] = $_SESSION['booking_id'];
+
+	$api = new Api($keyId, $keySecret);
+
+	$orderData = [
+		'receipt'         => (string)$_SESSION['booking_id'],
+		'amount'          => $_SESSION['amount'] * 100, // 39900 rupees in paise
+		'currency'        => $displayCurrency
+	];
+
+	$razorpayOrder = $api->order->create($orderData);
+
+	if (!empty($razorpayOrder['id'])) $_SESSION['order_id'] = $razorpayOrder['id'];
+}
 ?>
 <!DOCTYPE html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Reservation</title>
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Rasor pay script -->
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+	<link rel="stylesheet" href="scss/foundation.css">
+	<link rel="stylesheet" href="scss/style.css">
+	<link href='http://fonts.googleapis.com/css?family=Slabo+13px' rel='stylesheet' type='text/css'>
+	<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
+	<link rel="stylesheet" href="icon/css/fontello.css">
+	<link rel="stylesheet" href="icon/css/animation.css">
+	<!--[if IE 7]><link rel="stylesheet" href="css/fontello-ie7.css"><![endif]-->
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
+	<script src="jquery.backstretch.min.js"></script>
+	<!-- Script for razorpay Checkout -->
+	<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+	<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
+	<meta class="foundation-data-attribute-namespace">
+	<meta class="foundation-mq-xxlarge">
+	<meta class="foundation-mq-xlarge">
+	<meta class="foundation-mq-large">
+	<meta class="foundation-mq-medium">
+	<meta class="foundation-mq-small">
+	<meta class="foundation-mq-topbar">
+	<!-- Button Style for Payment -->
+	<style>
+		.pay-button {
+			background-color: #F37254;
+			color: white;
+			border: none;
+			padding: 15px 30px;
+			font-size: 16px;
+			border-radius: 5px;
+			cursor: pointer;
+			transition: background-color 0.3s ease;
+		}
 
-
-
-
-<link rel="stylesheet" href="scss/foundation.css">
-<link rel="stylesheet" href="scss/style.css">
-<link href='http://fonts.googleapis.com/css?family=Slabo+13px' rel='stylesheet' type='text/css'>
-<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" type="text/css" />
-<link rel="stylesheet" href="icon/css/fontello.css">
-<link rel="stylesheet" href="icon/css/animation.css">
-<!--[if IE 7]><link rel="stylesheet" href="css/fontello-ie7.css"><![endif]-->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/jquery-ui.min.js"></script>
-<script src="jquery.backstretch.min.js"></script>
-<link href='http://fonts.googleapis.com/css?family=Slabo+27px' rel='stylesheet' type='text/css'>
-<meta class="foundation-data-attribute-namespace">
-<meta class="foundation-mq-xxlarge">
-<meta class="foundation-mq-xlarge">
-<meta class="foundation-mq-large">
-<meta class="foundation-mq-medium">
-<meta class="foundation-mq-small">
-<style></style>
-<meta class="foundation-mq-topbar">
+		.pay-button:hover {
+			background-color: #d85a40;
+		}
+	</style>
+	<script>
+		function openRazorpayCheckout() {
+			var options = {
+				"key": "<?php echo $keyId; ?>",
+				"amount": "<?php echo $_SESSION['amount']; ?>",
+				"currency": "<?php echo $displayCurrency; ?>",
+				"name": "<?php echo $companyName; ?>",
+				"description": "Booking Web App",
+				"image": "./img/lalat3.png",
+				"order_id": "<?php echo $_SESSION['order_id']; ?>",
+				"handler": function(response) {
+					document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+					document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+					document.getElementById('razorpay_signature').value = response.razorpay_signature;
+					document.getElementById('paymentForm').submit();
+				},
+				"prefill": {
+					"name": "<?php echo $_SESSION['name']; ?>",
+					"email": "<?php echo $_SESSION['email']; ?>"
+				},
+				"theme": {
+					"color": "#F37254"
+				}
+			};
+			var rzp1 = new Razorpay(options);
+			rzp1.open();
+		}
+	</script>
 </head>
 
 <body class="fontbody">
@@ -82,9 +148,6 @@ session_start();
 		</div>
 
 	</div>
-	</div>
-	<div class="text-black">
-		<?php var_dump($_SESSION); ?>
 	</div>
 
 	<div class="row">
@@ -262,8 +325,8 @@ session_start();
 					<br><button class="button small " border="0" name="submit" alt="PayPal - The safer, easier way to pay online!" style="width:32%;background-color:#2ecc71; ">Pay Room Deposit Now</button>
 					<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
 					</form-->
-						<form action="checkout.php" method="post" target="_top">
-							<input type="hidden" name="name" value="<?php echo $_SESSION['firstname'].' '.$_SESSION['lastname'] ?>">
+						<!-- <form action="checkout.php" method="post" target="_top">
+							<input type="hidden" name="name" value="<?php echo $_SESSION['firstname'] . ' ' . $_SESSION['lastname'] ?>">
 							<input type="hidden" name="booking_id" value="<?php echo $_SESSION['booking_id'] ?>">
 							<input type="hidden" name="amount" value="<?php echo $_SESSION['total_amount'] ?>">
 
@@ -279,10 +342,16 @@ session_start();
 							<input type="hidden" name="custom" value="<?php echo $_SESSION['booking_id']; ?>">
 							<input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynowCC_LG.gif:NonHostedGuest">
 							<img type="image" src="img/paypal.jpg" style="background-color:white; width:32%; height:14%; padding:2px; "></img>
-							<br>
-							<button id="PayNow" class="button small " name="submit" alt="PayPal - The safer, easier way to pay online!" style="width:32%;background-color:#2ecc71; ">Pay Room Deposit Now</button>
-
-							<img alt="" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+							<br> -->
+						<!-- <button id="PayNow" class="button small " name="submit" alt="PayPal - The safer, easier way to pay online!" style="width:32%;background-color:#2ecc71; ">Pay Room Deposit Now</button> -->
+						<!-- </form> -->
+						<!-- Pay Button Form -->
+						<img alt="" src="https://www.ecommerce-nation.com/wp-content/uploads/2019/02/razorpay.webp" width="230rem" height="90rem">
+						<form style="padding-top: 1rem;" id="paymentForm" action="<?php echo $baseURL; ?>success.php" method="POST">
+							<input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+							<input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+							<input type="hidden" name="razorpay_signature" id="razorpay_signature">
+							<button type="button" class="pay-button" onclick="openRazorpayCheckout()">Pay <?php echo $_SESSION['amount']; ?> with Razorpay</button>
 						</form>
 
 
