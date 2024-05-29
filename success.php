@@ -12,7 +12,7 @@ $total = "";
 $deposit = "";
 $bal = "";
 $id = $_SESSION['booking_id'];
-// var_dump($_SESSION);
+
 if (!empty($_POST)) {
 	$order_id = $_SESSION['order_id'];
 

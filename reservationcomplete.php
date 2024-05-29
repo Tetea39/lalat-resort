@@ -256,10 +256,8 @@ if (!empty($_SESSION['total_amount'])) {
 
 										?>
 									</span>
-
 								</div>
 							</div>
-
 						</div>
 					</div><br>
 					<div class="row">
@@ -271,17 +269,10 @@ if (!empty($_SESSION['total_amount'])) {
 								<span class="fontslabo" style="font-size:32px; text-align:center;">INR
 									<?php echo $_SESSION['total_amount']; ?></span>
 							</p>
-
 						</div>
-
 						<div class="large-12 columns" style="max-width:100%;">
-
-
 						</div>
 					</div>
-
-
-
 					<div class="row">
 						<div class="large-12 columns">
 							<button name="submit" href="#" class="button small fontslabo" style="background-color:#2ecc71; width:100%;">Edit Reservation</button>
@@ -289,9 +280,6 @@ if (!empty($_SESSION['total_amount'])) {
 					</div>
 				</form>
 			</div>
-
-
-
 		</div>
 		<div class="large-8 columns blackblur fontcolor" style="padding:10px">
 
@@ -353,25 +341,11 @@ if (!empty($_SESSION['total_amount'])) {
 							<input type="hidden" name="razorpay_signature" id="razorpay_signature">
 							<button type="button" class="pay-button" onclick="openRazorpayCheckout()">Pay <?php echo $_SESSION['amount']; ?> with Razorpay</button>
 						</form>
-
-
 					</div>
 				</div>
 			</div>
-
-
-
 		</div>
-
-
 	</div>
-
-	<script>
-	</script>
-
-
-
-
 	<!-- Remove the container if you want to extend the Footer to full width. -->
 	<div class="container my-5">
 
